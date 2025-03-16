@@ -1,7 +1,12 @@
 package reserva.lab.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+
+@Entity
 public class Administrador extends Usuario{
 
+    @Column(nullable = false)
     private boolean podeAprovarReservas = true;
 
     public Administrador(){
