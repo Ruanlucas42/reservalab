@@ -18,8 +18,7 @@ public class Laboratorio {
     public Laboratorio(){
     }
 
-    public Laboratorio(Integer id, String nome, Integer capacidade) {
-        this.id = id;
+    public Laboratorio( String nome, Integer capacidade) {
         this.nome = nome;
         this.capacidade = capacidade;
     }

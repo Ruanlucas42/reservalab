@@ -1,11 +1,10 @@
 package reserva.lab.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Adicionando a anotação de herança
-@DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING) //  Definindo uma coluna para distinguir os tipos de usuário
-public class Usuario {
+public class SolicitacaoCadastro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,13 +19,24 @@ public class Usuario {
     @Column(nullable = false)
     private String senha;
 
-    public Usuario(){
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
+    @Column(nullable = false)
+    private LocalDateTime dataSolicitacao;
+
+    public SolicitacaoCadastro() {
+        this.status = Status.PENDENTE;
+        this.dataSolicitacao = LocalDateTime.now();
     }
 
-    public Usuario(String nome, String email, String senha) {
+    public SolicitacaoCadastro(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+        this.status = Status.PENDENTE;
+        this.dataSolicitacao = LocalDateTime.now();
     }
 
     public Integer getId() {
@@ -59,5 +69,21 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getDataSolicitacao() {
+        return dataSolicitacao;
+    }
+
+    public void setDataSolicitacao(LocalDateTime dataSolicitacao) {
+        this.dataSolicitacao = dataSolicitacao;
     }
 }

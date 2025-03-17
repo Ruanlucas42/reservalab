@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reserva.lab.model.Administrador;
 import reserva.lab.model.Reserva;
 import reserva.lab.service.ReservaService;
 
@@ -49,8 +50,8 @@ public class ReservaController {
     }
 
     @PatchMapping("/{id}/aprovar")
-    public ResponseEntity<Reserva> aprovarReserva(@PathVariable int id) {
-        Reserva reserva = reservaService.aprovarReserva(id);
+    public ResponseEntity<Reserva> aprovarReserva(@PathVariable int id, @RequestParam int administradorId) {
+        Reserva reserva = reservaService.aprovarReserva(id, administradorId);
         return new ResponseEntity<>(reserva, HttpStatus.OK);
     }
 

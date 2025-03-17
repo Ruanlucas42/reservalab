@@ -1,22 +1,24 @@
 package reserva.lab.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-public class Administrador extends Usuario{
+@DiscriminatorValue("ADMINISTRADOR")
+public class Administrador extends Usuario {
 
     @Column(nullable = false)
     private boolean podeAprovarReservas = true;
 
-    public Administrador(){
+    public Administrador() {
     }
 
-    public Administrador( String nome, String email, String senha) {
+    public Administrador(String nome, String email, String senha) {
         super(nome, email, senha);
-        this.podeAprovarReservas = true;
     }
 
+    // Getter e Setter para o atributo 'podeAprovarReservas'
     public boolean isPodeAprovarReservas() {
         return podeAprovarReservas;
     }

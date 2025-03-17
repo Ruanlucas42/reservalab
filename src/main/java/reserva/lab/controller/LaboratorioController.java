@@ -37,13 +37,22 @@ public class LaboratorioController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Laboratorio> atualizarLaboratorio(@PathVariable int id, @RequestBody Laboratorio laboratorioAtualizado) {
-        Laboratorio laboratorio = laboratorioService.atualizarLaboratorio(id, laboratorioAtualizado);
-        return new ResponseEntity<>(laboratorio, HttpStatus.OK);
+        return laboratorioService.buscarLaboratorioPorId(id).map(laboratorio -> {
+                    Laboratorio atualizado = laboratorioService.atualizarLaboratorio(id, laboratorioAtualizado);
+                    return new ResponseEntity<>(atualizado, HttpStatus.OK);
+                })
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarLaboratorio(@PathVariable int id) {
-        laboratorioService.deletarLaboratorio(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return laboratorioService.buscarLaboratorioPorId(id)
+                .map(laboratorio -> {
+                    laboratorioService.deletarLaboratorio(id);
+                    return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+                })
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 }

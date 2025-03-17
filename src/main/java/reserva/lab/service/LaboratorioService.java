@@ -22,13 +22,17 @@ public class LaboratorioService {
         return laboratorioRepository.findAll();
     }
 
-    public Optional<Laboratorio> buscarLaboratorioPorId(int id){
+    public Optional<Laboratorio> buscarLaboratorioPorId(int id) {
         return laboratorioRepository.findById(id);
     }
 
-    public Laboratorio atualizarLaboratorio(int id, Laboratorio laboratorio){
-        laboratorio.setId(id);
-        return laboratorioRepository.save(laboratorio);
+
+    public Laboratorio atualizarLaboratorio(int id, Laboratorio laboratorioAtualizado) {
+        return laboratorioRepository.findById(id).map(laboratorio -> {
+            laboratorio.setNome(laboratorioAtualizado.getNome());
+            laboratorio.setCapacidade(laboratorioAtualizado.getCapacidade());
+            return laboratorioRepository.save(laboratorio);
+        }).orElseThrow(() -> new RuntimeException("Laboratório não encontrado"));
     }
 
     public void deletarLaboratorio(int id){

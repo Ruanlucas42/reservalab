@@ -2,8 +2,8 @@ package reserva.lab.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Entity
 public class Reserva {
@@ -13,7 +13,7 @@ public class Reserva {
     private Integer id;
 
     @Column(nullable = false)
-    private Date data;
+    private LocalDate data;
 
     @Column(nullable = false)
     private LocalTime horarioInicio;
@@ -25,9 +25,10 @@ public class Reserva {
     @Column(nullable = false)
     private Status status;
 
+
     @ManyToOne
-    @JoinColumn(name = "solicitante_id", nullable = false)
-    private Solicitante solicitante;
+    @JoinColumn(name = "administrador_id")
+    private Administrador aprovador;
 
 
     @ManyToOne
@@ -37,13 +38,12 @@ public class Reserva {
     public Reserva(){
     }
 
-    public Reserva(Integer id, Date data, LocalTime horarioInicio, LocalTime horarioFim, Status status, Solicitante solicitante, Laboratorio laboratorio) {
-        this.id = id;
+    public Reserva(LocalDate data, LocalTime horarioInicio, LocalTime horarioFim, Status status, SolicitacaoCadastro solicitacaoCadastro, Administrador aprovador, Laboratorio laboratorio) {
         this.data = data;
         this.horarioInicio = horarioInicio;
         this.horarioFim = horarioFim;
         this.status = status;
-        this.solicitante = solicitante;
+        this.aprovador = aprovador;
         this.laboratorio = laboratorio;
     }
 
@@ -55,13 +55,11 @@ public class Reserva {
         this.id = id;
     }
 
-    public Date getData() {
-
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(Date data) {
-
+    public void setData(LocalDate data) {
         this.data = data;
     }
 
@@ -91,14 +89,6 @@ public class Reserva {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public Solicitante getSolicitante() {
-        return solicitante;
-    }
-
-    public void setSolicitante(Solicitante solicitante) {
-        this.solicitante = solicitante;
     }
 
     public Laboratorio getLaboratorio() {
