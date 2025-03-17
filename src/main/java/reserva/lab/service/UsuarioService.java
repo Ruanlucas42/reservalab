@@ -2,12 +2,13 @@ package reserva.lab.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reserva.lab.model.Administrador;
+import reserva.lab.dto.UsuarioDTO;
 import reserva.lab.model.Usuario;
 import reserva.lab.repository.UsuarioRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -15,46 +16,52 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Criar um novo usuário
-    public Usuario criarUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+    public UsuarioDTO criarUsuario(UsuarioDTO usuarioDTO) {
+        Usuario usuario = convertToEntity(usuarioDTO);
+        Usuario novoUsuario = usuarioRepository.save(usuario);
+        return convertToDTO(novoUsuario);
     }
 
-    // Listar todos os usuários
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> listarUsuarios() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        return usuarios.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Buscar um usuário por ID
-    public Optional<Usuario> buscarUsuarioPorId(int id) {
-        return usuarioRepository.findById(id);
+    public Optional<UsuarioDTO> buscarUsuarioPorId(int id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        return usuarioOpt.map(this::convertToDTO);
     }
 
-    // Atualizar um usuário
-    public Usuario atualizarUsuario(int id, Usuario usuarioAtualizado) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setNome(usuarioAtualizado.getNome());
-            usuario.setEmail(usuarioAtualizado.getEmail());
-            usuario.setSenha(usuarioAtualizado.getSenha());
-            return usuarioRepository.save(usuario);
+    public UsuarioDTO atualizarUsuario(int id, UsuarioDTO usuarioDTO) {
+        Usuario usuario = convertToEntity(usuarioDTO);
+        return usuarioRepository.findById(id).map(existingUsuario -> {
+            existingUsuario.setNome(usuario.getNome());
+            existingUsuario.setEmail(usuario.getEmail());
+            existingUsuario.setSenha(usuario.getSenha());
+            Usuario usuarioAtualizado = usuarioRepository.save(existingUsuario);
+            return convertToDTO(usuarioAtualizado);
         }).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
-    // Deletar um usuário
     public void deletarUsuario(int id) {
         usuarioRepository.deleteById(id);
     }
 
-    public List<Administrador> listarAdministradores() {
-        return usuarioRepository.findAll().stream()
-                .filter(usuario -> usuario instanceof Administrador)
-                .map(usuario -> (Administrador) usuario)
-                .toList();
+    public UsuarioDTO convertToDTO(Usuario usuario) {
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+        usuarioDTO.setNome(usuario.getNome());
+        usuarioDTO.setEmail(usuario.getEmail());
+        usuarioDTO.setSenha(usuario.getSenha());
+        return usuarioDTO;
     }
 
-    public Administrador criarAdministrador(Administrador administrador) {
-        return usuarioRepository.save(administrador);
+    public Usuario convertToEntity(UsuarioDTO usuarioDTO) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(usuarioDTO.getNome());
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setSenha(usuarioDTO.getSenha());
+        return usuario;
     }
-
-
 }

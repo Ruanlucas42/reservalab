@@ -1,43 +1,15 @@
-package reserva.lab.model;
+package reserva.lab.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-public class SolicitacaoCadastro {
+public class SolicitacaoCadastroDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String senha;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-
-    @Column(nullable = false)
+    private String status;
     private LocalDateTime dataSolicitacao;
-
-    public SolicitacaoCadastro() {
-        this.status = Status.PENDENTE;
-        this.dataSolicitacao = LocalDateTime.now();
-    }
-
-    public SolicitacaoCadastro(String nome, String email, String senha) {
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-        this.status = Status.PENDENTE;
-        this.dataSolicitacao = LocalDateTime.now();
-    }
 
     public Integer getId() {
         return id;
@@ -71,11 +43,11 @@ public class SolicitacaoCadastro {
         this.senha = senha;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

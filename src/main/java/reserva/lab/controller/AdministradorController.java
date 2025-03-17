@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reserva.lab.model.Administrador;
-import reserva.lab.model.Usuario;
-import reserva.lab.service.UsuarioService;
+import reserva.lab.dto.AdministradorDTO;
+import reserva.lab.service.AdministradorService;
 
 import java.util.List;
 
@@ -14,41 +13,36 @@ import java.util.List;
 @RequestMapping("/administradores")
 public class AdministradorController {
 
-        @Autowired
-        private UsuarioService usuarioService;
+    @Autowired
+    private AdministradorService administradorService;
 
-        @PostMapping
-        public ResponseEntity<Administrador> criarAdministrador(@RequestBody Administrador administrador) {
-            Administrador novoAdministrador = usuarioService.criarAdministrador(administrador);
-            return new ResponseEntity<>(novoAdministrador, HttpStatus.CREATED);
-        }
-
+    @PostMapping
+    public ResponseEntity<AdministradorDTO> criarAdministrador(@RequestBody AdministradorDTO administradorDTO) {
+        AdministradorDTO novoAdministrador = administradorService.criarAdministrador(administradorDTO);
+        return new ResponseEntity<>(novoAdministrador, HttpStatus.CREATED);
+    }
 
     @GetMapping
-    public ResponseEntity<List<Administrador>> listarAdministradores() {
-        List<Administrador> administradores = usuarioService.listarAdministradores();
+    public ResponseEntity<List<AdministradorDTO>> listarAdministradores() {
+        List<AdministradorDTO> administradores = administradorService.listarAdministradores();
         return new ResponseEntity<>(administradores, HttpStatus.OK);
     }
 
-
-
     @GetMapping("/{id}")
-        public ResponseEntity<Usuario> buscarAdministradorPorId(@PathVariable int id) {
-            return usuarioService.buscarUsuarioPorId(id)
-                    .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        }
-
-        @PutMapping("/{id}")
-        public ResponseEntity<Usuario> atualizarAdministrador(@PathVariable int id, @RequestBody Administrador administradorAtualizado) {
-            Usuario administrador = usuarioService.atualizarUsuario(id, administradorAtualizado);
-            return new ResponseEntity<>(administrador, HttpStatus.OK);
-        }
-
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> deletarAdministrador(@PathVariable int id) {
-            usuarioService.deletarUsuario(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+    public ResponseEntity<AdministradorDTO> buscarAdministradorPorId(@PathVariable int id) {
+        AdministradorDTO administradorDTO = administradorService.buscarAdministradorPorId(id);
+        return new ResponseEntity<>(administradorDTO, HttpStatus.OK);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<AdministradorDTO> atualizarAdministrador(@PathVariable int id, @RequestBody AdministradorDTO administradorDTO) {
+        AdministradorDTO administradorAtualizado = administradorService.atualizarAdministrador(id, administradorDTO);
+        return new ResponseEntity<>(administradorAtualizado, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarAdministrador(@PathVariable int id) {
+        administradorService.deletarAdministrador(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}

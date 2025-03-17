@@ -1,33 +1,12 @@
-package reserva.lab.model;
+package reserva.lab.dto;
 
-import jakarta.persistence.*;
+public class UsuarioDTO {
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo_usuario", discriminatorType = DiscriminatorType.STRING)
-public class Usuario {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false)
     private String nome;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
     private String senha;
-
-    public Usuario() {
-    }
-
-    public Usuario(String nome, String email, String senha) {
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-    }
+    private String tipoUsuario;
 
     public Integer getId() {
         return id;
@@ -61,7 +40,15 @@ public class Usuario {
         this.senha = senha;
     }
 
+    public String getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
+
     public boolean isAdministrador() {
-        return this instanceof Administrador;
+        return "ADMINISTRADOR".equalsIgnoreCase(this.tipoUsuario);
     }
 }

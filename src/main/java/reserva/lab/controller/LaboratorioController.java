@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reserva.lab.model.Laboratorio;
+import reserva.lab.dto.LaboratorioDTO;
 import reserva.lab.service.LaboratorioService;
 
 import java.util.List;
@@ -17,33 +17,31 @@ public class LaboratorioController {
     private LaboratorioService laboratorioService;
 
     @PostMapping
-    public ResponseEntity<Laboratorio>  criarLaboratorio(@RequestBody Laboratorio laboratorio){
-        Laboratorio novoLaboratorio = laboratorioService.criarLaboratorio(laboratorio);
+    public ResponseEntity<LaboratorioDTO> criarLaboratorio(@RequestBody LaboratorioDTO laboratorioDTO) {
+        LaboratorioDTO novoLaboratorio = laboratorioService.criarLaboratorio(laboratorioDTO);
         return new ResponseEntity<>(novoLaboratorio, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Laboratorio>> listarLaboratorios() {
-        List<Laboratorio> laboratorios = laboratorioService.listarLaboratorios();
+    public ResponseEntity<List<LaboratorioDTO>> listarLaboratorios() {
+        List<LaboratorioDTO> laboratorios = laboratorioService.listarLaboratorios();
         return new ResponseEntity<>(laboratorios, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Laboratorio> buscarLaboratorioPorId(@PathVariable int id) {
+    public ResponseEntity<LaboratorioDTO> buscarLaboratorioPorId(@PathVariable int id) {
         return laboratorioService.buscarLaboratorioPorId(id)
-                .map(laboratorio -> new ResponseEntity<>(laboratorio, HttpStatus.OK))
+                .map(laboratorioDTO -> new ResponseEntity<>(laboratorioDTO, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Laboratorio> atualizarLaboratorio(@PathVariable int id, @RequestBody Laboratorio laboratorioAtualizado) {
+    public ResponseEntity<LaboratorioDTO> atualizarLaboratorio(@PathVariable int id, @RequestBody LaboratorioDTO laboratorioDTO) {
         return laboratorioService.buscarLaboratorioPorId(id).map(laboratorio -> {
-                    Laboratorio atualizado = laboratorioService.atualizarLaboratorio(id, laboratorioAtualizado);
-                    return new ResponseEntity<>(atualizado, HttpStatus.OK);
-                })
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            LaboratorioDTO atualizado = laboratorioService.atualizarLaboratorio(id, laboratorioDTO);
+            return new ResponseEntity<>(atualizado, HttpStatus.OK);
+        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarLaboratorio(@PathVariable int id) {
@@ -54,5 +52,4 @@ public class LaboratorioController {
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 }

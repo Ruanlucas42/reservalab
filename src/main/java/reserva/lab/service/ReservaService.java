@@ -3,6 +3,7 @@ package reserva.lab.service;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reserva.lab.dto.ReservaDTO;
 import reserva.lab.model.Laboratorio;
 import reserva.lab.model.Reserva;
 import reserva.lab.model.Status;
@@ -13,6 +14,7 @@ import reserva.lab.repository.AdministradorRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
@@ -26,66 +28,88 @@ public class ReservaService {
     @Autowired
     private AdministradorRepository administradorRepository;
 
-    public Reserva criarReserva(Reserva reserva) {
-
-        Laboratorio laboratorio = laboratorioRepository.findById(reserva.getLaboratorio().getId())
+    public ReservaDTO criarReserva(ReservaDTO reservaDTO) {
+        Laboratorio laboratorio = laboratorioRepository.findById(reservaDTO.getLaboratorioId())
                 .orElseThrow(() -> new RuntimeException("Laboratório não encontrado"));
 
-        reserva.setLaboratorio(laboratorio);
+        Reserva reserva = new Reserva();
+        reserva.setData(reservaDTO.getData());
+        reserva.setHorarioInicio(reservaDTO.getHorarioInicio());
+        reserva.setHorarioFim(reservaDTO.getHorarioFim());
         reserva.setStatus(Status.PENDENTE);
+        reserva.setLaboratorio(laboratorio);
 
-        return reservaRepository.save(reserva);
+        Reserva novaReserva = reservaRepository.save(reserva);
+        return convertToDTO(novaReserva);
     }
 
-    public List<Reserva> listarReservas() {
-        return reservaRepository.findAll();
+    public List<ReservaDTO> listarReservas() {
+        List<Reserva> reservas = reservaRepository.findAll();
+        return reservas.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Reserva> buscarReservaPorId(int id) {
-        return reservaRepository.findById(id);
+    public Optional<ReservaDTO> buscarReservaPorId(int id) {
+        return reservaRepository.findById(id)
+                .map(this::convertToDTO);
     }
 
-    public Reserva atualizarReserva(int id, Reserva reserva) {
+    public ReservaDTO atualizarReserva(int id, ReservaDTO reservaDTO) {
         Reserva reservaExistente = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
-        reserva.setId(id);
-        reserva.setLaboratorio(reservaExistente.getLaboratorio());
-        reserva.setStatus(reservaExistente.getStatus());
+        reservaExistente.setData(reservaDTO.getData());
+        reservaExistente.setHorarioInicio(reservaDTO.getHorarioInicio());
+        reservaExistente.setHorarioFim(reservaDTO.getHorarioFim());
+        reservaExistente.setStatus(Status.valueOf(reservaDTO.getStatus()));
 
-        return reservaRepository.save(reserva);
+        Reserva reservaAtualizada = reservaRepository.save(reservaExistente);
+        return convertToDTO(reservaAtualizada);
     }
 
     public void deletarReserva(int id) {
-        if (!reservaRepository.existsById(id)) {
-            throw new RuntimeException("Reserva não encontrada");
-        }
-        reservaRepository.deleteById(id);
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+
+        reservaRepository.delete(reserva);
     }
 
     @Transactional
-    public Reserva aprovarReserva(int id, int administradorId) {
+    public ReservaDTO recusarReserva(int id, Administrador administrador) {
+        if (administrador == null || !administrador.isAdministrador()) {
+            throw new RuntimeException("Apenas administradores podem recusar reservas");
+        }
 
-        Administrador administrador = administradorRepository.findById(administradorId)
-                .orElseThrow(() -> new RuntimeException("Administrador não encontrado"));
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
+        reserva.setStatus(Status.RECUSADA);
+        Reserva reservaRecusada = reservaRepository.save(reserva);
+        return convertToDTO(reservaRecusada);
+    }
 
-        if (!administrador.isPodeAprovarReservas()) {
-            throw new RuntimeException("Apenas administradores com permissão podem aprovar reservas");
+    @Transactional
+    public ReservaDTO aprovarReserva(int id, Administrador administrador) {
+        if (administrador == null || !administrador.isAdministrador()) {
+            throw new RuntimeException("Apenas administradores podem aprovar reservas");
         }
 
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
         reserva.setStatus(Status.APROVADA);
-        return reservaRepository.save(reserva);
+        Reserva reservaAprovada = reservaRepository.save(reserva);
+        return convertToDTO(reservaAprovada);
     }
 
-    public Reserva recusarReserva(int id) {
-        Reserva reserva = reservaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
-
-        reserva.setStatus(Status.RECUSADA);
-        return reservaRepository.save(reserva);
+    private ReservaDTO convertToDTO(Reserva reserva) {
+        ReservaDTO dto = new ReservaDTO();
+        dto.setData(reserva.getData());
+        dto.setHorarioInicio(reserva.getHorarioInicio());
+        dto.setHorarioFim(reserva.getHorarioFim());
+        dto.setStatus(reserva.getStatus().name());
+        dto.setLaboratorioId(reserva.getLaboratorio().getId());
+        return dto;
     }
 }

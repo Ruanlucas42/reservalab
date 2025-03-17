@@ -18,7 +18,6 @@ public class Administrador extends Usuario {
         super(nome, email, senha);
     }
 
-    // Getter e Setter para o atributo 'podeAprovarReservas'
     public boolean isPodeAprovarReservas() {
         return podeAprovarReservas;
     }
